@@ -220,27 +220,30 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+        // 🚨 這裡很重要：除了基礎 app，我們還要載入 Firestore 資料庫的工具
         import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
+        // 這是你剛剛提供的新專案金鑰 (japan-son)
         const firebaseConfig = {
-            apiKey: "AIzaSyCZCjjMmbRo98ujnLDKTpCtCqh7WsnZbzw",
-            authDomain: "japan-63762.firebaseapp.com",
-            projectId: "japan-63762",
-            storageBucket: "japan-63762.firebasestorage.app",
-            messagingSenderId: "757533646054",
-            appId: "1:757533646054:web:7c8ea2fdebed8005ca6f27",
-            measurementId: "G-4VY71QFXXK"
+            apiKey: "AIzaSyAQQ95ZxJ6Vm2l7mUm1xq4Z4kmorVLK3bo",
+            authDomain: "japan-son.firebaseapp.com",
+            projectId: "japan-son",
+            storageBucket: "japan-son.firebasestorage.app",
+            messagingSenderId: "101435316387",
+            appId: "1:101435316387:web:6ce7f57b77e3f6aeb84716",
+            measurementId: "G-DBZJCQQZ5D"
         };
 
+        // 啟動 Firebase 與資料庫
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // 抓取專案的邏輯完全不用變！
         async function loadProjects() {
             const grid = document.getElementById('portfolio-grid');
             const dataStore = document.getElementById('project-data-store');
             
             try {
-                // 從 "projects" 集合抓取資料，按建立時間新到舊排序
                 const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
                 const snapshot = await getDocs(q);
                 
@@ -256,7 +259,6 @@
                     const data = doc.data(); 
                     const projectId = doc.id; 
                     
-                    // 1. 生成外層卡片 (加入 loading="lazy" 效能優化)
                     const cardHTML = `
                         <div class="portfolio-item-frame" data-category="${data.category || 'all'}" onclick="openModal('${projectId}')">
                             <div class="frame-image">
@@ -270,7 +272,6 @@
                     `;
                     grid.innerHTML += cardHTML;
 
-                    // 2. 將專案完整資料轉成字串，藏在隱藏區塊中，給彈窗呼叫使用
                     const dataScript = document.createElement('script');
                     dataScript.type = "application/json";
                     dataScript.id = `data-${projectId}`;
@@ -284,7 +285,6 @@
             }
         }
 
-        // 啟動載入
         loadProjects();
     </script>
 </body>
