@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>王子銓 | WANG TZU-CHUAN Portfolio (動態架構版)</title>
+    <title>王子銓 | WANG TZU-CHUAN Portfolio</title>
     <style>
         :root {
             --primary-dark: #1a1a1a;
             --accent-blue: #0984e3;
             --bg-light: #f4f7f6;
             --text-serif: 'Times New Roman', Times, serif; 
+            --tag-collab: #27ae60;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang TC', 'Heiti TC', sans-serif; }
@@ -100,6 +101,7 @@
         <div style="font-family: var(--text-serif); letter-spacing: 2px;">WANG TZU-CHUAN</div>
         <div>
             <a href="#portfolio">PORTFOLIO</a>
+            <a href="#guestbook">GUESTBOOK</a>
         </div>
     </nav>
 
@@ -116,6 +118,7 @@
         <div class="filter-container">
             <button class="filter-btn active" onclick="filterPortfolio('all')">全部 ALL</button>
             <button class="filter-btn" onclick="filterPortfolio('design')">建築設計</button>
+            <button class="filter-btn" onclick="filterPortfolio('poster')">海報設計</button>
             <button class="filter-btn" onclick="filterPortfolio('drawing')">製圖實作</button>
         </div>
 
@@ -123,6 +126,40 @@
             <p style="grid-column: 1/-1; text-align: center; color: #888;">正在從 Firebase 載入作品資料...</p>
         </div>
     </section>
+
+    <section id="guestbook" style="padding: 80px 10%; background: #fdfdfd; border-top: 1px solid #eee;">
+        <div class="section-header-wrap" style="padding: 0 0 30px 0;">
+            <h2 class="stylish-title">GUEST<strong>BOOK</strong></h2>
+        </div>
+        
+        <div style="max-width: 600px;">
+            <p style="margin-bottom: 20px; color: #666;">歡迎留下你的建議或與我交流：</p>
+            
+            <input type="text" id="guestName" placeholder="你的名字 Name (最多 20 字)" maxlength="20" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
+            
+            <textarea id="guestMsg" placeholder="留言內容 Message (最多 100 字)" rows="4" maxlength="100" oninput="document.getElementById('charCount').innerText = this.value.length" style="width: 100%; padding: 12px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
+            
+            <div style="text-align: right; font-size: 0.85rem; color: #999; margin-bottom: 15px;">
+                <span id="charCount">0</span> / 100 字
+            </div>
+
+            <button onclick="sendFeedback()" style="background: var(--accent-blue); color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s;">
+                發送留言 Send
+            </button>
+            <p id="statusMsg" style="margin-top: 15px; font-weight: bold; color: var(--tag-collab);"></p>
+
+            <div id="messagesList" style="margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                <h3 style="font-size: 1.2rem; font-family: sans-serif; margin-bottom: 15px; color: #333;">最新留言 Recent Messages</h3>
+                <div id="messagesContainer">
+                    <p style="color: #999;">留言載入中 Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background: #fff; padding: 40px; text-align: center; font-size: 0.85rem; color: #888; border-top: 1px solid #eee;">
+        <p>&copy; 2026 王子銓 WANG TZU-CHUAN. All Rights Reserved.</p>
+    </footer>
 
     <div id="dynamic-modal" class="modal">
         <div class="modal-container">
@@ -170,45 +207,40 @@
         // --- 動態彈窗控制邏輯 ---
         let currentSlideIndex = 0;
 
-        function openModal(projectId) {
-            // 從暫存區抓取該專案的資料
+        window.openModal = function(projectId) {
             const dataElement = document.getElementById(`data-${projectId}`);
             if(!dataElement) return;
             
             const projectData = JSON.parse(dataElement.textContent);
 
-            // 1. 替換標題與敘述
-            document.getElementById('modal-title').innerText = projectData.title;
+            document.getElementById('modal-title').innerText = projectData.title || "無標題";
             document.getElementById('modal-desc').innerText = projectData.description || "暫無說明";
 
-            // 2. 動態生成圖片輪播結構
             const slider = document.getElementById('modal-slider');
-            slider.innerHTML = ""; // 先清空舊圖片
+            slider.innerHTML = ""; 
             
-            // 假設 Firebase 裡存的是圖片網址陣列 sliderImages: ["img1.jpg", "img2.jpg"]
             if(projectData.sliderImages && projectData.sliderImages.length > 0) {
                 projectData.sliderImages.forEach((imgUrl, index) => {
                     const img = document.createElement('img');
                     img.src = imgUrl;
-                    img.className = index === 0 ? 'slider-img active' : 'slider-img'; // 第一張預設顯示
+                    img.className = index === 0 ? 'slider-img active' : 'slider-img';
                     slider.appendChild(img);
                 });
             } else {
                 slider.innerHTML = `<img src="${projectData.coverImage}" class="slider-img active">`;
             }
 
-            // 重置索引並開啟彈窗
             currentSlideIndex = 0;
             document.getElementById('dynamic-modal').style.display = "block";
             document.body.style.overflow = "hidden";
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             document.getElementById('dynamic-modal').style.display = "none";
             document.body.style.overflow = "auto";
         }
 
-        function changeSlide(direction) {
+        window.changeSlide = function(direction) {
             const imgs = document.querySelectorAll('#modal-slider .slider-img');
             if(imgs.length <= 1) return;
 
@@ -220,8 +252,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-        // 🚨 這裡很重要：除了基礎 app，我們還要載入 Firestore 資料庫的工具
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
         // 這是你剛剛提供的新專案金鑰 (japan-son)
         const firebaseConfig = {
@@ -234,11 +265,10 @@
             measurementId: "G-DBZJCQQZ5D"
         };
 
-        // 啟動 Firebase 與資料庫
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 抓取專案的邏輯完全不用變！
+        // --- 1. 載入作品集 ---
         async function loadProjects() {
             const grid = document.getElementById('portfolio-grid');
             const dataStore = document.getElementById('project-data-store');
@@ -285,7 +315,119 @@
             }
         }
 
+        // --- 2. 載入留言板 (防範 XSS 攻擊寫法) ---
+        async function loadMessages() {
+            const container = document.getElementById('messagesContainer');
+            if (!container) return;
+
+            try {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                const q = query(
+                    collection(db, "messages"), 
+                    where("createdAt", ">=", thirtyDaysAgo),
+                    orderBy("createdAt", "desc")
+                );
+
+                const querySnapshot = await getDocs(q);
+                container.innerHTML = ""; 
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = "<p style='color:#999;'>目前還沒有留言，來搶頭香吧！</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    const safeName = document.createElement('div');
+                    safeName.textContent = data.visitorName || "匿名訪客";
+                    
+                    const safeContent = document.createElement('div');
+                    safeContent.textContent = data.content || "";
+
+                    const time = data.createdAt ? data.createdAt.toDate().toLocaleString('zh-TW') : "剛剛";
+
+                    const msgHTML = `
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 15px; border-left: 4px solid var(--accent-blue);">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                                <strong style="font-size: 1.1rem; color: var(--primary-dark);">${safeName.innerHTML}</strong>
+                                <span style="font-size: 0.8rem; color: #888;">${time}</span>
+                            </div>
+                            <p style="color: #444; margin: 0; line-height: 1.6;">${safeContent.innerHTML}</p>
+                        </div>
+                    `;
+                    container.innerHTML += msgHTML;
+                });
+            } catch (error) {
+                console.error("讀取留言失敗：", error);
+                container.innerHTML = "<p style='color: red;'>讀取留言失敗，請確認資料庫權限。</p>";
+            }
+        }
+
+        // --- 3. 發送留言 (包含前端防呆驗證) ---
+        window.sendFeedback = async function() {
+            const name = document.getElementById('guestName')?.value.trim();
+            const msg = document.getElementById('guestMsg')?.value.trim();
+            const status = document.getElementById('statusMsg');
+
+            if (!name || !msg) {
+                if(status) {
+                    status.style.color = "red";
+                    status.innerText = "❌ 請填寫名字與內容喔！";
+                }
+                return; 
+            }
+
+            if (name.length > 20 || msg.length > 100) {
+                if(status) {
+                    status.style.color = "red";
+                    status.innerText = "❌ 名字或留言超過字數限制！";
+                }
+                return;
+            }
+
+            try {
+                if(status) {
+                    status.style.color = "var(--accent-blue)";
+                    status.innerText = "傳送中...";
+                }
+                
+                await addDoc(collection(db, "messages"), {
+                    visitorName: name,
+                    content: msg,
+                    createdAt: serverTimestamp() 
+                });
+                
+                if(status) {
+                    status.style.color = "green";
+                    status.innerText = "✅ 留言成功！";
+                }
+                document.getElementById('guestName').value = "";
+                document.getElementById('guestMsg').value = "";
+                document.getElementById('charCount').innerText = "0"; 
+                
+                loadMessages(); 
+
+                setTimeout(() => { if(status) status.innerText = ""; }, 3000);
+                
+            } catch (error) {
+                console.error("傳送失敗：", error);
+                if(status) {
+                    status.style.color = "red";
+                    if(error.code === 'permission-denied') {
+                        status.innerText = "❌ 留言失敗：格式不符或權限不足。";
+                    } else {
+                        status.innerText = "❌ 伺服器錯誤，請稍後再試。";
+                    }
+                }
+            }
+        };
+
+        // 網頁載入時啟動
         loadProjects();
+        loadMessages();
     </script>
 </body>
 </html>
