@@ -1,15 +1,291 @@
-<section id="portfolio">
-    <div class="section-header-wrap">
-        <h2>SELECTED <strong>WORKS</strong></h2>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王子銓 | WANG TZU-CHUAN Portfolio (動態架構版)</title>
+    <style>
+        :root {
+            --primary-dark: #1a1a1a;
+            --accent-blue: #0984e3;
+            --bg-light: #f4f7f6;
+            --text-serif: 'Times New Roman', Times, serif; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang TC', 'Heiti TC', sans-serif; }
+        img { max-width: 100%; height: auto; display: block; }
+        body { line-height: 1.8; color: var(--primary-dark); scroll-behavior: smooth; background: #fff; overflow-x: hidden; }
+
+        /* --- 導覽列 --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 20px 8%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+            transition: 0.4s ease;
+        }
+        nav.scrolled {
+            background: rgba(255,255,255,0.98); 
+            padding: 15px 8%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        nav a, nav div { color: rgba(255,255,255,0.95); transition: 0.3s; font-weight: bold; text-decoration: none;}
+        nav.scrolled a, nav.scrolled div { color: var(--primary-dark) !important; }
+        nav a { margin-left: 20px; font-size: 0.9rem; letter-spacing: 1px; }
+        nav a:hover { color: var(--accent-blue) !important; }
+
+        /* --- Header --- */
+        header {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070') center/cover no-repeat fixed;
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+            padding: 0 10%; color: white;
+        }
+        .hero-title { font-size: 4rem; font-family: var(--text-serif); line-height: 1.2; margin-bottom: 20px;}
+        .hero-desc { font-size: 1.1rem; max-width: 600px; opacity: 0.9; }
+
+        /* --- 分區標題 --- */
+        .section-header-wrap { padding: 100px 10% 40px 10%; }
+        .stylish-title { font-size: 3rem; color: #e0e0e0; text-transform: uppercase; margin-bottom: 20px; font-family: var(--text-serif);}
+        .stylish-title strong { color: var(--primary-dark); display: block; }
+        .stylish-title::before { content: ""; display: block; width: 60px; height: 5px; background: var(--accent-blue); margin-bottom: 20px; }
+
+        /* --- 作品集區塊 --- */
+        #portfolio { background: var(--bg-light); padding-bottom: 100px; }
+        .filter-container { display: flex; gap: 15px; margin: 0 10% 40px 10%; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 8px 20px; border: 1px solid #ddd; background: white; 
+            border-radius: 25px; cursor: pointer; font-weight: 600; color: #666; transition: 0.3s;
+        }
+        .filter-btn.active, .filter-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 40px; padding: 0 10%; }
+        
+        .portfolio-item-frame { 
+            border: 1px solid #ddd; background: #fff; padding: 15px; border-radius: 12px; 
+            cursor: pointer; transition: 0.3s ease;
+        }
+        .portfolio-item-frame:hover { transform: translateY(-8px); border-color: var(--accent-blue); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .portfolio-item-frame.hidden { display: none; }
+        
+        .frame-image { width: 100%; height: 350px; background: #f8f9fa; border-radius: 8px; overflow: hidden; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;}
+        .frame-image img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .portfolio-item-frame:hover .frame-image img { transform: scale(1.05); }
+        
+        .frame-info-card { padding: 10px; }
+        .project-title { font-size: 1.15rem; font-weight: bold; color: var(--primary-dark); margin-bottom: 6px; }
+        .project-category { font-size: 0.85rem; color: var(--accent-blue); font-weight: bold;}
+
+        /* --- 唯一動態彈窗 --- */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
+        .modal-container { background: white; width: 90%; max-width: 1000px; margin: 50px auto; padding: 40px; border-radius: 15px; position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 2rem; border-left: 5px solid var(--accent-blue); padding-left: 15px; }
+        .close-btn { font-size: 40px; cursor: pointer; color: #999; border: none; background: none; }
+        
+        .slider-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; border-radius: 8px; margin-bottom: 20px;}
+        .slider-img { width: 100%; height: 100%; object-fit: contain; display: none; } 
+        .slider-img.active { display: block; }
+        
+        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; width: 40px; height: 40px; border: none; cursor: pointer; font-size: 1.5rem; border-radius: 50%; }
+        .prev { left: 15px; } .next { right: 15px; }
+        .modal-desc-footer { font-size: 1.05rem; color: #444; border-top: 1px solid #eee; padding-top: 20px; white-space: pre-line;}
+        
+        /* 隱藏儲存原始資料的空間 */
+        #project-data-store { display: none; }
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <div style="font-family: var(--text-serif); letter-spacing: 2px;">WANG TZU-CHUAN</div>
+        <div>
+            <a href="#portfolio">PORTFOLIO</a>
+        </div>
+    </nav>
+
+    <header>
+        <h1 class="hero-title">Spatial Thinking<br>× Digital Tools</h1>
+        <p class="hero-desc">透過建築設計，探索實體空間與數位智能的邊界。全面導入 Firebase 後端技術，打造無縫載入的數位作品集。</p>
+    </header>
+
+    <section id="portfolio">
+        <div class="section-header-wrap">
+            <h2 class="stylish-title">SELECTED<br><strong>WORKS</strong></h2>
+        </div>
+
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filterPortfolio('all')">全部 ALL</button>
+            <button class="filter-btn" onclick="filterPortfolio('design')">建築設計</button>
+            <button class="filter-btn" onclick="filterPortfolio('drawing')">製圖實作</button>
+        </div>
+
+        <div id="portfolio-grid" class="portfolio-grid">
+            <p style="grid-column: 1/-1; text-align: center; color: #888;">正在從 Firebase 載入作品資料...</p>
+        </div>
+    </section>
+
+    <div id="dynamic-modal" class="modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title">作品標題</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="slider-wrap" id="modal-slider">
+                </div>
+            
+            <button class="nav-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+            <button class="nav-arrow next" onclick="changeSlide(1)">&#10095;</button>
+
+            <div class="modal-desc-footer" id="modal-desc">
+                作品描述內容...
+            </div>
+        </div>
     </div>
 
-    <div class="filter-container">
-        <button class="filter-btn active" onclick="filterPortfolio('all')">全部</button>
-        <button class="filter-btn" onclick="filterPortfolio('design')">建築設計</button>
-        <button class="filter-btn" onclick="filterPortfolio('drawing')">製圖</button>
-    </div>
+    <div id="project-data-store"></div>
 
-    <div id="portfolio-grid" class="portfolio-grid">
-        <p style="text-align: center; color: #999; grid-column: 1 / -1;">作品載入中 Loading...</p>
-    </div>
-</section>
+    <script>
+        // 導覽列滾動效果
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled'); 
+            else nav.classList.remove('scrolled');
+        });
+
+        // 作品分類過濾
+        function filterPortfolio(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.portfolio-item-frame').forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- 動態彈窗控制邏輯 ---
+        let currentSlideIndex = 0;
+
+        function openModal(projectId) {
+            // 從暫存區抓取該專案的資料
+            const dataElement = document.getElementById(`data-${projectId}`);
+            if(!dataElement) return;
+            
+            const projectData = JSON.parse(dataElement.textContent);
+
+            // 1. 替換標題與敘述
+            document.getElementById('modal-title').innerText = projectData.title;
+            document.getElementById('modal-desc').innerText = projectData.description || "暫無說明";
+
+            // 2. 動態生成圖片輪播結構
+            const slider = document.getElementById('modal-slider');
+            slider.innerHTML = ""; // 先清空舊圖片
+            
+            // 假設 Firebase 裡存的是圖片網址陣列 sliderImages: ["img1.jpg", "img2.jpg"]
+            if(projectData.sliderImages && projectData.sliderImages.length > 0) {
+                projectData.sliderImages.forEach((imgUrl, index) => {
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.className = index === 0 ? 'slider-img active' : 'slider-img'; // 第一張預設顯示
+                    slider.appendChild(img);
+                });
+            } else {
+                slider.innerHTML = `<img src="${projectData.coverImage}" class="slider-img active">`;
+            }
+
+            // 重置索引並開啟彈窗
+            currentSlideIndex = 0;
+            document.getElementById('dynamic-modal').style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            document.getElementById('dynamic-modal').style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        function changeSlide(direction) {
+            const imgs = document.querySelectorAll('#modal-slider .slider-img');
+            if(imgs.length <= 1) return;
+
+            imgs[currentSlideIndex].classList.remove('active');
+            currentSlideIndex = (currentSlideIndex + direction + imgs.length) % imgs.length;
+            imgs[currentSlideIndex].classList.add('active');
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZCjjMmbRo98ujnLDKTpCtCqh7WsnZbzw",
+            authDomain: "japan-63762.firebaseapp.com",
+            projectId: "japan-63762",
+            storageBucket: "japan-63762.firebasestorage.app",
+            messagingSenderId: "757533646054",
+            appId: "1:757533646054:web:7c8ea2fdebed8005ca6f27",
+            measurementId: "G-4VY71QFXXK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadProjects() {
+            const grid = document.getElementById('portfolio-grid');
+            const dataStore = document.getElementById('project-data-store');
+            
+            try {
+                // 從 "projects" 集合抓取資料，按建立時間新到舊排序
+                const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                
+                grid.innerHTML = ""; 
+                dataStore.innerHTML = "";
+
+                if (snapshot.empty) {
+                    grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>目前 Firebase 中還沒有建立任何作品資料。</p>";
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data(); 
+                    const projectId = doc.id; 
+                    
+                    // 1. 生成外層卡片 (加入 loading="lazy" 效能優化)
+                    const cardHTML = `
+                        <div class="portfolio-item-frame" data-category="${data.category || 'all'}" onclick="openModal('${projectId}')">
+                            <div class="frame-image">
+                                <img src="${data.coverImage || ''}" loading="lazy" alt="${data.title}">
+                            </div>
+                            <div class="frame-info-card">
+                                <div class="project-title">${data.title || '未命名作品'}</div>
+                                <div class="project-category">● ${data.categoryLabel || '未分類'}</div>
+                            </div>
+                        </div>
+                    `;
+                    grid.innerHTML += cardHTML;
+
+                    // 2. 將專案完整資料轉成字串，藏在隱藏區塊中，給彈窗呼叫使用
+                    const dataScript = document.createElement('script');
+                    dataScript.type = "application/json";
+                    dataScript.id = `data-${projectId}`;
+                    dataScript.textContent = JSON.stringify(data);
+                    dataStore.appendChild(dataScript);
+                });
+
+            } catch (error) {
+                console.error("載入作品失敗：", error);
+                grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: red;'>連線至 Firebase 失敗，請確認資料庫權限設定是否為允許讀取。</p>";
+            }
+        }
+
+        // 啟動載入
+        loadProjects();
+    </script>
+</body>
+</html>
