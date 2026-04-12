@@ -34,6 +34,16 @@
         nav a { margin-left: 20px; font-size: 0.9rem; letter-spacing: 1px; }
         nav a:hover { color: var(--accent-blue) !important; }
 
+        /* --- 雙語按鈕樣式 --- */
+        .lang-btn {
+            background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); 
+            padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; cursor: pointer; 
+            margin-left: 20px; transition: 0.3s; backdrop-filter: blur(5px);
+        }
+        .lang-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); color: white; }
+        nav.scrolled .lang-btn { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+        nav.scrolled .lang-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
         /* --- Header --- */
         header {
             height: 100vh;
@@ -99,15 +109,16 @@
 
     <nav id="navbar">
         <div style="font-family: var(--text-serif); letter-spacing: 2px;">WANG TZU-CHUAN</div>
-        <div>
-            <a href="#portfolio">PORTFOLIO</a>
-            <a href="#guestbook">GUESTBOOK</a>
+        <div style="display: flex; align-items: center;">
+            <a href="#portfolio" data-i18n="nav_portfolio">PORTFOLIO</a>
+            <a href="#guestbook" data-i18n="nav_guestbook">GUESTBOOK</a>
+            <button class="lang-btn" onclick="toggleLanguage()">🌐 EN/CH</button>
         </div>
     </nav>
 
     <header>
         <h1 class="hero-title">Spatial Thinking<br>× Digital Tools</h1>
-        <p class="hero-desc">透過建築設計，探索實體空間與數位智能的邊界。全面導入 Firebase 後端技術，打造無縫載入的數位作品集。</p>
+        <p class="hero-desc" data-i18n="hero_desc">透過建築設計，探索實體空間與數位智能的邊界。全面導入 Firebase 後端技術，打造無縫載入的數位作品集。</p>
     </header>
 
     <section id="portfolio">
@@ -116,14 +127,14 @@
         </div>
 
         <div class="filter-container">
-            <button class="filter-btn active" onclick="filterPortfolio('all')">全部 ALL</button>
-            <button class="filter-btn" onclick="filterPortfolio('design')">建築設計</button>
-            <button class="filter-btn" onclick="filterPortfolio('poster')">海報設計</button>
-            <button class="filter-btn" onclick="filterPortfolio('drawing')">製圖實作</button>
+            <button class="filter-btn active" onclick="filterPortfolio('all')" data-i18n="filter_all">全部 ALL</button>
+            <button class="filter-btn" onclick="filterPortfolio('design')" data-i18n="filter_design">建築設計</button>
+            <button class="filter-btn" onclick="filterPortfolio('poster')" data-i18n="filter_poster">海報設計</button>
+            <button class="filter-btn" onclick="filterPortfolio('drawing')" data-i18n="filter_drawing">製圖實作</button>
         </div>
 
         <div id="portfolio-grid" class="portfolio-grid">
-            <p style="grid-column: 1/-1; text-align: center; color: #888;">正在從 Firebase 載入作品資料...</p>
+            <p style="grid-column: 1/-1; text-align: center; color: #888;" data-i18n="loading_projects">正在從 Firebase 載入作品資料...</p>
         </div>
     </section>
 
@@ -133,25 +144,25 @@
         </div>
         
         <div style="max-width: 600px;">
-            <p style="margin-bottom: 20px; color: #666;">歡迎留下你的建議或與我交流：</p>
+            <p style="margin-bottom: 20px; color: #666;" data-i18n="guestbook_prompt">歡迎留下你的建議或與我交流：</p>
             
             <input type="text" id="guestName" placeholder="你的名字 Name (最多 20 字)" maxlength="20" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
             
             <textarea id="guestMsg" placeholder="留言內容 Message (最多 100 字)" rows="4" maxlength="100" oninput="document.getElementById('charCount').innerText = this.value.length" style="width: 100%; padding: 12px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
             
             <div style="text-align: right; font-size: 0.85rem; color: #999; margin-bottom: 15px;">
-                <span id="charCount">0</span> / 100 字
+                <span id="charCount">0</span> / 100
             </div>
 
-            <button onclick="sendFeedback()" style="background: var(--accent-blue); color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s;">
+            <button onclick="sendFeedback()" style="background: var(--accent-blue); color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s;" data-i18n="btn_send">
                 發送留言 Send
             </button>
             <p id="statusMsg" style="margin-top: 15px; font-weight: bold; color: var(--tag-collab);"></p>
 
             <div id="messagesList" style="margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 20px;">
-                <h3 style="font-size: 1.2rem; font-family: sans-serif; margin-bottom: 15px; color: #333;">最新留言 Recent Messages</h3>
+                <h3 style="font-size: 1.2rem; font-family: sans-serif; margin-bottom: 15px; color: #333;" data-i18n="recent_messages">最新留言 Recent Messages</h3>
                 <div id="messagesContainer">
-                    <p style="color: #999;">留言載入中 Loading...</p>
+                    <p style="color: #999;" data-i18n="loading_messages">留言載入中 Loading...</p>
                 </div>
             </div>
         </div>
@@ -169,7 +180,7 @@
             </div>
             
             <div class="slider-wrap" id="modal-slider">
-                </div>
+            </div>
             
             <button class="nav-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
             <button class="nav-arrow next" onclick="changeSlide(1)">&#10095;</button>
@@ -204,10 +215,76 @@
             });
         }
 
+        // --- 翻譯字典與切換語言邏輯 ---
+        const translations = {
+            "zh-TW": {
+                nav_portfolio: "作品集 PORTFOLIO",
+                nav_guestbook: "留言板 GUESTBOOK",
+                hero_desc: "透過建築設計，探索實體空間與數位智能的邊界。全面導入 Firebase 後端技術，打造無縫載入的數位作品集。",
+                filter_all: "全部 ALL",
+                filter_design: "建築設計",
+                filter_poster: "海報設計",
+                filter_drawing: "製圖實作",
+                loading_projects: "正在從 Firebase 載入作品資料...",
+                guestbook_prompt: "歡迎留下你的建議或與我交流：",
+                btn_send: "發送留言 Send",
+                recent_messages: "最新留言 Recent Messages",
+                loading_messages: "留言載入中 Loading...",
+                btn_lang: "🌐 EN/CH"
+            },
+            "en": {
+                nav_portfolio: "PORTFOLIO",
+                nav_guestbook: "GUESTBOOK",
+                hero_desc: "Exploring the boundaries between physical space and digital intelligence through architectural design. Fully integrated with Firebase backend to create a seamlessly loaded digital portfolio.",
+                filter_all: "ALL",
+                filter_design: "Arch. Design",
+                filter_poster: "Poster Design",
+                filter_drawing: "Drafting",
+                loading_projects: "Loading projects from Firebase...",
+                guestbook_prompt: "Welcome to leave your suggestions or communicate with me:",
+                btn_send: "Send Message",
+                recent_messages: "Recent Messages",
+                loading_messages: "Loading messages...",
+                btn_lang: "🌐 中/英"
+            }
+        };
+
+        let currentLang = 'zh-TW';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh-TW' ? 'en' : 'zh-TW';
+            document.documentElement.lang = currentLang;
+            
+            // 更新按鈕文字
+            const btn = document.querySelector('.lang-btn');
+            btn.innerText = translations[currentLang]["btn_lang"];
+            
+            // 更新所有帶有 data-i18n 的靜態文字
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    if(el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
+                         el.placeholder = translations[currentLang][key];
+                    } else {
+                         el.innerText = translations[currentLang][key];
+                    }
+                }
+            });
+
+            // 針對留言輸入框的 placeholder 切換處理
+            const guestName = document.getElementById('guestName');
+            const guestMsg = document.getElementById('guestMsg');
+            if(guestName && guestMsg) {
+                 guestName.placeholder = currentLang === 'zh-TW' ? "你的名字 Name (最多 20 字)" : "Your Name (Max 20 chars)";
+                 guestMsg.placeholder = currentLang === 'zh-TW' ? "留言內容 Message (最多 100 字)" : "Message (Max 100 chars)";
+            }
+        }
+
         // --- 動態彈窗控制邏輯 ---
         let currentSlideIndex = 0;
 
-       window.openModal = function(projectId) {
+        window.openModal = function(projectId) {
             const dataElement = document.getElementById(`data-${projectId}`);
             if(!dataElement) return;
             
@@ -224,7 +301,7 @@
                 descContainer.innerHTML += `
                     <br><br>
                     <a href="${projectData.pdfUrl}" target="_blank" download style="display: inline-block; padding: 8px 16px; background: #0984e3; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                        📁 下載專案 PDF
+                        📁 下載專案 PDF / Download PDF
                     </a>
                 `;
             }
@@ -234,12 +311,9 @@
             slider.innerHTML = ""; 
             
             if (projectData.isPresentation && projectData.pdfUrl) {
-                // 如果是簡報模式，直接塞入 iframe 讀取 PDF
                 slider.innerHTML = `<iframe src="${projectData.pdfUrl}#toolbar=0&view=FitH" width="100%" height="100%" style="border:none;">您的瀏覽器不支援 PDF 預覽</iframe>`;
-                // 隱藏左右切換按鈕，因為 PDF 內建滾動
                 document.querySelectorAll('#dynamic-modal .nav-arrow').forEach(btn => btn.style.display = 'none');
             } else {
-                // 一般圖片輪播模式
                 document.querySelectorAll('#dynamic-modal .nav-arrow').forEach(btn => btn.style.display = 'block');
                 
                 if (projectData.sliderImages && projectData.sliderImages.length > 0) {
@@ -265,12 +339,20 @@
         }
 
         window.changeSlide = function(direction) {
+            const imgs = document.querySelectorAll('#modal-slider .slider-img');
+            if(imgs.length <= 1) return;
+
+            imgs[currentSlideIndex].classList.remove('active');
+            currentSlideIndex = (currentSlideIndex + direction + imgs.length) % imgs.length;
+            imgs[currentSlideIndex].classList.add('active');
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-        // 這是你剛剛提供的新專案金鑰 (japan-son)
+        // 這是你的新專案金鑰 (japan-son)
         const firebaseConfig = {
             apiKey: "AIzaSyAQQ95ZxJ6Vm2l7mUm1xq4Z4kmorVLK3bo",
             authDomain: "japan-son.firebaseapp.com",
@@ -297,7 +379,7 @@
                 dataStore.innerHTML = "";
 
                 if (snapshot.empty) {
-                    grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>目前 Firebase 中還沒有建立任何作品資料。</p>";
+                    grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;' data-i18n='loading_projects'>目前 Firebase 中還沒有建立任何作品資料。</p>";
                     return;
                 }
 
@@ -331,7 +413,7 @@
             }
         }
 
-        // --- 2. 載入留言板 (防範 XSS 攻擊寫法) ---
+        // --- 2. 載入留言板 ---
         async function loadMessages() {
             const container = document.getElementById('messagesContainer');
             if (!container) return;
@@ -382,7 +464,7 @@
             }
         }
 
-        // --- 3. 發送留言 (包含前端防呆驗證) ---
+        // --- 3. 發送留言 ---
         window.sendFeedback = async function() {
             const name = document.getElementById('guestName')?.value.trim();
             const msg = document.getElementById('guestMsg')?.value.trim();
@@ -391,7 +473,7 @@
             if (!name || !msg) {
                 if(status) {
                     status.style.color = "red";
-                    status.innerText = "❌ 請填寫名字與內容喔！";
+                    status.innerText = "❌ 請填寫名字與內容喔！ / Please enter name and message!";
                 }
                 return; 
             }
@@ -399,7 +481,7 @@
             if (name.length > 20 || msg.length > 100) {
                 if(status) {
                     status.style.color = "red";
-                    status.innerText = "❌ 名字或留言超過字數限制！";
+                    status.innerText = "❌ 名字或留言超過字數限制！ / Exceeded character limit!";
                 }
                 return;
             }
@@ -407,7 +489,7 @@
             try {
                 if(status) {
                     status.style.color = "var(--accent-blue)";
-                    status.innerText = "傳送中...";
+                    status.innerText = currentLang === 'zh-TW' ? "傳送中..." : "Sending...";
                 }
                 
                 await addDoc(collection(db, "messages"), {
@@ -418,7 +500,7 @@
                 
                 if(status) {
                     status.style.color = "green";
-                    status.innerText = "✅ 留言成功！";
+                    status.innerText = currentLang === 'zh-TW' ? "✅ 留言成功！" : "✅ Message Sent!";
                 }
                 document.getElementById('guestName').value = "";
                 document.getElementById('guestMsg').value = "";
@@ -433,9 +515,9 @@
                 if(status) {
                     status.style.color = "red";
                     if(error.code === 'permission-denied') {
-                        status.innerText = "❌ 留言失敗：格式不符或權限不足。";
+                        status.innerText = currentLang === 'zh-TW' ? "❌ 留言失敗：格式不符或權限不足。" : "❌ Failed: Permission Denied.";
                     } else {
-                        status.innerText = "❌ 伺服器錯誤，請稍後再試。";
+                        status.innerText = currentLang === 'zh-TW' ? "❌ 伺服器錯誤，請稍後再試。" : "❌ Server Error.";
                     }
                 }
             }
