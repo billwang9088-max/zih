@@ -207,27 +207,51 @@
         // --- 動態彈窗控制邏輯 ---
         let currentSlideIndex = 0;
 
-        window.openModal = function(projectId) {
+       window.openModal = function(projectId) {
             const dataElement = document.getElementById(`data-${projectId}`);
             if(!dataElement) return;
             
             const projectData = JSON.parse(dataElement.textContent);
 
             document.getElementById('modal-title').innerText = projectData.title || "無標題";
-            document.getElementById('modal-desc').innerText = projectData.description || "暫無說明";
+            
+            // 1. 處理敘述與 PDF 下載按鈕
+            const descContainer = document.getElementById('modal-desc');
+            descContainer.innerText = projectData.description || "暫無說明";
+            
+            // 如果有勾選允許下載 PDF，自動加上下載按鈕
+            if (projectData.downloadPdf && projectData.pdfUrl) {
+                descContainer.innerHTML += `
+                    <br><br>
+                    <a href="${projectData.pdfUrl}" target="_blank" download style="display: inline-block; padding: 8px 16px; background: #0984e3; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        📁 下載專案 PDF
+                    </a>
+                `;
+            }
 
+            // 2. 處理畫廊區塊 (一般圖片輪播 vs 簡報 iframe 模式)
             const slider = document.getElementById('modal-slider');
             slider.innerHTML = ""; 
             
-            if(projectData.sliderImages && projectData.sliderImages.length > 0) {
-                projectData.sliderImages.forEach((imgUrl, index) => {
-                    const img = document.createElement('img');
-                    img.src = imgUrl;
-                    img.className = index === 0 ? 'slider-img active' : 'slider-img';
-                    slider.appendChild(img);
-                });
+            if (projectData.isPresentation && projectData.pdfUrl) {
+                // 如果是簡報模式，直接塞入 iframe 讀取 PDF
+                slider.innerHTML = `<iframe src="${projectData.pdfUrl}#toolbar=0&view=FitH" width="100%" height="100%" style="border:none;">您的瀏覽器不支援 PDF 預覽</iframe>`;
+                // 隱藏左右切換按鈕，因為 PDF 內建滾動
+                document.querySelectorAll('#dynamic-modal .nav-arrow').forEach(btn => btn.style.display = 'none');
             } else {
-                slider.innerHTML = `<img src="${projectData.coverImage}" class="slider-img active">`;
+                // 一般圖片輪播模式
+                document.querySelectorAll('#dynamic-modal .nav-arrow').forEach(btn => btn.style.display = 'block');
+                
+                if (projectData.sliderImages && projectData.sliderImages.length > 0) {
+                    projectData.sliderImages.forEach((imgUrl, index) => {
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        img.className = index === 0 ? 'slider-img active' : 'slider-img';
+                        slider.appendChild(img);
+                    });
+                } else {
+                    slider.innerHTML = `<img src="${projectData.coverImage}" class="slider-img active">`;
+                }
             }
 
             currentSlideIndex = 0;
@@ -241,14 +265,6 @@
         }
 
         window.changeSlide = function(direction) {
-            const imgs = document.querySelectorAll('#modal-slider .slider-img');
-            if(imgs.length <= 1) return;
-
-            imgs[currentSlideIndex].classList.remove('active');
-            currentSlideIndex = (currentSlideIndex + direction + imgs.length) % imgs.length;
-            imgs[currentSlideIndex].classList.add('active');
-        }
-    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
